@@ -50,45 +50,66 @@ https://user-images.githubusercontent.com/4397546/224310754-665eb2dd-aadc-47dc-b
 
 
 ## Environment
-```
+```bash
+# 1. Clone the repository
 git clone https://github.com/vinthony/video-retalking.git
 cd video-retalking
-conda create -n video_retalking python=3.8
-conda activate video_retalking
 
+# 2. Create and activate conda environment
+conda create -n video-retalking python=3.8
+conda activate video-retalking
+
+# 3. Install core dependencies
+pip install torch==2.0.1 torchvision==0.15.2
+pip install basicsr==1.4.2
+pip install kornia==0.7.3
+pip install face-alignment==1.3.5
+pip install facexlib==0.3.0
+pip install dlib==19.24.2
+pip install opencv-python==4.11.0.86
+pip install librosa==0.10.2.post1
+pip install gtts==2.5.4
+
+# 4. Install ffmpeg
 conda install ffmpeg
-
-# Please follow the instructions from https://pytorch.org/get-started/previous-versions/
-# This installation command only works on CUDA 11.1
-pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
-
-pip install -r requirements.txt
 ```
 
-## Quick Inference
+## Quick Start
 
-#### Pretrained Models
-Please download our [pre-trained models](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) and put them in `./checkpoints`.
+#### Web Interface (Recommended)
+```bash
+# 1. Activate environment
+conda activate video-retalking
 
-<!-- We also provide some [example videos and audio](https://drive.google.com/drive/folders/14OwbNGDCAMPPdY-l_xO1axpUjkPxI9Dv?usp=share_link). Please put them in `./examples`. -->
-
-#### Inference
-
+# 2. Start the web application
+python app.py
 ```
-python3 inference.py \
-  --face examples/face/1.mp4 \
-  --audio examples/audio/1.wav \
-  --outfile results/1_1.mp4
+Then visit http://127.0.0.1:7861 in your browser.
+
+#### Command Line Usage
+1. Generate audio from text:
+```bash
+# Generate mp3
+python -c "
+from gtts import gTTS
+tts = gTTS(text='要说的话', lang='zh-cn')
+tts.save('temp_audio.mp3')
+"
+
+# Convert to wav
+ffmpeg -i temp_audio.mp3 -acodec pcm_s16le -ar 16000 -ac 1 -y temp_audio.wav
 ```
-This script includes data preprocessing steps. You can test any talking face videos without manual alignment. But it is worth noting that DNet cannot handle extreme poses.
 
-You can also control the expression by adding the following parameters:
+2. Generate video:
+```bash
+python inference.py \
+    --face examples/face/3.mp4 \
+    --audio temp_audio.wav \
+    --outfile output.mp4 \
+    --re_preprocess
+```
 
-```--exp_img```: Pre-defined expression template. The default is "neutral". You can choose "smile" or an image path.
-
-```--up_face```: You can choose "surprise" or "angry" to modify the expression of upper face with [GANimation](https://github.com/donydchen/ganimation_replicate).
-
-
+For more detailed instructions and troubleshooting, please refer to [QUICK_START.md](QUICK_START.md).
 
 ## Citation
 

@@ -156,9 +156,8 @@ if __name__ == "__main__":
             logger.info("Created UI, launching server...")
             demo.launch(
                 server_name="127.0.0.1",
-                server_port=7860,
-                debug=True,
-                show_error=True
+                server_port=7861,  # 使用7861端口
+                share=False
             )
             logger.info("Server launched!")
         except Exception as e:

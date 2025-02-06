@@ -1,107 +1,113 @@
 # Video-Retalking Quick Start Guide
 
 ## 环境要求
-- Python 3.12
-- pip (最新版本)
+- Python 3.8 (必须是3.8版本)
+- conda (推荐使用 miniconda)
 
-## 依赖安装
+## 环境配置
 ```bash
-# 1. 安装特定版本的 numpy
-pip install "numpy<2.0.0"
+# 1. 创建并激活 conda 环境
+conda create -n video-retalking python=3.8
+conda activate video-retalking
 
-# 2. 安装 torch 和 torchvision
-pip install torchvision==0.15.2
-
-# 3. 安装其他必要依赖
-pip install einops
-pip install kornia
-pip install facexlib
-pip install librosa
-
-# 4. 安装 gtts (用于文字转语音)
-pip install gtts
+# 2. 安装核心依赖包
+pip install torch==2.0.1 torchvision==0.15.2
+pip install basicsr==1.4.2
+pip install kornia==0.7.3
+pip install face-alignment==1.3.5
+pip install facexlib==0.3.0
+pip install dlib==19.24.2
+pip install opencv-python==4.11.0.86
+pip install librosa==0.10.2.post1
+pip install gtts==2.5.4
 ```
 
 ## 使用方法
 
 ### 1. 使用 Web 界面（推荐）
 ```bash
+# 1. 激活环境
+conda activate video-retalking
+
+# 2. 启动应用
 python app.py
 ```
-启动后访问 http://127.0.0.1:7860
+启动后访问 http://127.0.0.1:7861
 
 ### 2. 使用命令行
 #### 2.1 生成语音文件
-```python
+```bash
+# 1. 生成 mp3 文件
+python -c "
 from gtts import gTTS
+tts = gTTS(text='要说的话', lang='zh-cn')
+tts.save('temp_audio.mp3')
+"
 
-# 生成中文语音
-text = "要说的话"
-tts = gTTS(text, lang='zh')
-tts.save('temp_audio.wav')
+# 2. 转换为 wav 格式
+ffmpeg -i temp_audio.mp3 -acodec pcm_s16le -ar 16000 -ac 1 -y temp_audio.wav
 ```
 
 #### 2.2 生成视频
 ```bash
-python inference.py \
-    --face INPUT_VIDEO_PATH \
-    --audio AUDIO_PATH \
-    --outfile OUTPUT_PATH \
-    --re_preprocess \
-    --img_size 160
-```
+# 1. 创建输出目录
+mkdir -p results
 
-例如：
-```bash
+# 2. 运行生成
 python inference.py \
     --face examples/face/3.mp4 \
     --audio temp_audio.wav \
-    --outfile output.mp4 \
-    --re_preprocess \
-    --img_size 160
+    --outfile results/output.mp4 \
+    --re_preprocess
 ```
+
+生成的视频将保存在 `results` 目录下。
 
 ## 日常使用（已安装环境）
 如果你已经完成了上述环境配置，重启电脑后只需要：
 
-1. 打开终端，进入项目目录：
+1. 激活环境：
+```bash
+conda activate video-retalking
+```
+
+2. 进入项目目录：
 ```bash
 cd /Users/jianqin/Desktop/2dHuman/video-retalking
 ```
 
-2. 启动 web 应用：
+3. 启动 web 应用：
 ```bash
 python app.py
 ```
 
-3. 在浏览器中访问 http://127.0.0.1:7860
+4. 在浏览器中访问 http://127.0.0.1:7861
 
 ## 参数说明
 - `--face`: 输入视频路径
 - `--audio`: 输入音频路径
 - `--outfile`: 输出视频路径
 - `--re_preprocess`: 重新预处理
-- `--img_size`: 视频分辨率大小
 
 ## 注意事项
-1. 首次运行时会自动下载一些模型文件，需要等待一段时间
-2. 视频生成过程可能需要几分钟到几十分钟不等，取决于视频长度和电脑性能
-3. 建议使用较短的视频和文本进行测试
+1. 必须使用 Python 3.8，其他版本可能会导致依赖包不兼容
+2. 确保使用 conda 环境 `video-retalking`，不要在 base 环境中运行
+3. 首次运行时会自动下载一些模型文件，需要等待一段时间
+4. 视频生成过程可能需要几分钟到几十分钟不等，取决于视频长度和电脑性能
 
 ## 常见问题
-1. 如果出现端口被占用的错误，可以使用以下命令查找并关闭占用端口的进程：
-```bash
-lsof -i :7860
-kill <PID>
-```
+1. 如果出现端口被占用的错误，可以：
+   - 修改 app.py 中的端口号（默认 7861）
+   - 或使用以下命令查找并关闭占用端口的进程：
+   ```bash
+   lsof -i :7861
+   kill <PID>
+   ```
 
-2. 如果生成的视频质量不理想，可以：
-   - 增加 `--img_size` 的值（如 256、512 等）
+2. 如果遇到 "No module named 'xxx'" 错误：
+   - 确保已激活正确的 conda 环境
+   - 重新安装对应的依赖包
+
+3. 如果生成的视频质量不理想：
    - 使用更清晰的输入视频
    - 确保输入视频中人物面部清晰可见
-
-## 模型文件位置
-所有必要的模型文件应该位于 `checkpoints` 目录下：
-- DNet.pt
-- LNet.pth
-- ENet.pth
