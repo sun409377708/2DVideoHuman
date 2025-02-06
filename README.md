@@ -8,77 +8,73 @@
 - 支持中文文本转语音
 - 自动进行人脸检测和特征点提取
 - 生成高质量的唇形同步视频
+- 提供简单易用的 Web 界面
 
 ## 环境要求
 
-- Python 3.8
-- PyTorch
-- FFmpeg
-- 其他依赖请参考 `video-retalking/requirements.txt`
+- Python 3.12
+- pip (最新版本)
 
-## 安装步骤
+详细的依赖和安装步骤请参考 `video-retalking/QUICK_START.md`。
 
-1. 克隆仓库：
-```bash
-git clone https://github.com/sun409377708/2DVideoHuman.git
-cd 2DVideoHuman
-```
+## 快速开始
 
-2. 安装依赖：
+1. 进入项目目录：
 ```bash
 cd video-retalking
-pip install -r requirements.txt
 ```
 
-3. 下载预训练模型：
+2. 启动 Web 界面：
 ```bash
-# 创建checkpoints目录
-mkdir checkpoints
-# 下载模型文件到checkpoints目录
+python app.py
 ```
+
+3. 在浏览器中访问 http://127.0.0.1:7860
 
 ## 使用方法
 
-1. 准备一个人脸视频文件，放在`video-retalking/examples/face/`目录下
+### Web 界面（推荐）
+1. 上传一个包含人脸的视频文件
+2. 输入想要说的文字
+3. 点击生成按钮
+4. 等待处理完成后下载生成的视频
 
-2. 运行测试：
-```python
-python app.py --test
-```
+### 命令行方式
+如果你需要更多控制，也可以使用命令行方式：
 
-3. 自定义生成：
-```python
-from app import process_video
-
-# 处理视频
-video_path = "examples/face/your_video.mp4"
-text = "你想要数字人说的话"
-output_path = process_video(video_path, text)
+```bash
+python inference.py \
+    --face INPUT_VIDEO_PATH \
+    --audio AUDIO_PATH \
+    --outfile OUTPUT_PATH \
+    --re_preprocess \
+    --img_size 160
 ```
 
 ## 项目结构
 
-```
-2DVideoHuman/
-├── video-retalking/       # 核心代码目录
-│   ├── app.py            # 主应用程序
-│   ├── inference.py      # 推理代码
-│   ├── models/          # 模型定义
-│   ├── utils/           # 工具函数
-│   └── third_part/      # 第三方依赖
-└── README.md
-```
+- `app.py`: Web 应用入口
+- `inference.py`: 核心推理代码
+- `QUICK_START.md`: 详细的安装和使用指南
+- `checkpoints/`: 模型检查点目录
+- `models/`: 模型文件目录
+- `examples/`: 示例文件
+- `docs/`: 文档
 
 ## 注意事项
 
-- 确保输入视频中包含清晰的人脸
-- 视频分辨率建议不要太大，可以预处理到320x320
-- 生成的视频会保存在桌面上
+1. 首次运行时会自动下载必要的模型文件
+2. 视频生成时间取决于输入视频的长度和电脑性能
+3. 建议使用较短的视频和文本进行测试
 
-## 贡献
+## 问题排查
 
-欢迎提交Issue和Pull Request！
+如果遇到问题，请：
+
+1. 确认已经安装了所有必要的依赖
+2. 检查是否有必要的模型文件
+3. 查看 `QUICK_START.md` 中的常见问题部分
 
 ## 许可证
 
-本项目遵循MIT许可证。详见LICENSE文件。
+本项目基于 MIT 许可证开源。
